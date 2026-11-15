@@ -1,0 +1,21 @@
+{
+  "name": "com.blumgames.folder-icon",
+  "version": "1.0.0",
+  "displayName": "BlumFolderIcon",
+  "description": "Find your folders faster. Automatic colors and symbols for the Unity Project window, with per-folder customization.",
+  "unity": "2022.3",
+  "author": {
+    "name": "blumgames",
+    "url": "https://github.com/Betoraf"
+  },
+  "license": "MIT",
+  "keywords": [
+    "editor",
+    "folders",
+    "icons",
+    "organization"
+  ],
+  "documentationUrl": "https://github.com/Betoraf/BlumFolderIcon#readme",
+  "changelogUrl": "https://github.com/Betoraf/BlumFolderIcon/blob/main/CHANGELOG.md",
+  "licensesUrl": "https://github.com/Betoraf/BlumFolderIcon/blob/main/LICENSE.md"
+}

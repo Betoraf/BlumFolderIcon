@@ -1,0 +1,9 @@
+{
+  "name": "Blumgames.FolderIcon.Editor",
+  "rootNamespace": "Blumgames.FolderIcon",
+  "references": [],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true,
+  "allowUnsafeCode": false,
+  "noEngineReferences": false
+}
