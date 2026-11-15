@@ -9,6 +9,7 @@ namespace Blumgames.FolderIcon
     public sealed class FolderIconSettings : ScriptableSingleton<FolderIconSettings>
     {
         [SerializeField] bool initialized;
+        [SerializeField] int paletteVersion;
         [SerializeField] bool enabled = true;
         [SerializeField] bool automatic = true;
         [SerializeField] List<FolderRule> rules = new List<FolderRule>();
@@ -25,9 +26,19 @@ namespace Blumgames.FolderIcon
 
         void EnsureDefaults()
         {
-            if (initialized) return;
-            rules = FolderPresets.CreateRules();
-            initialized = true;
+            if (!initialized)
+            {
+                rules = FolderPresets.CreateRules();
+                initialized = true;
+                paletteVersion = 1;
+                return;
+            }
+            if (paletteVersion >= 1) return;
+            bool changed = false;
+            foreach (var rule in rules) changed |= FolderPresets.UpgradeColor(rule?.style);
+            foreach (var item in overrides) changed |= FolderPresets.UpgradeColor(item?.style);
+            paletteVersion = 1;
+            if (changed) Save(true);
         }
 
         void BuildLookup()

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.0 — 2026-11-16
+
+- Brighter 8-color palette and 22 redesigned, softer symbols.
+- Original layered folder shape with a visible dark rear tab and subtle depth.
+- Consistent artwork in Project folders and customization previews.
+- Old preset colors upgrade automatically; custom colors and folder assignments remain intact.
+- Updated cover and artwork previews, with editable SVG sources.
+
+
 ## 1.0.0 — 2026-11-16
 
 - Automatic folder styling with 19 editable name rules.

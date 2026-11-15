@@ -94,6 +94,7 @@ public static class FolderIconChecks
         Check(FolderIconRenderer.IconRect(new Rect(20,10,140,16)).width==16,"list icon width");
         var grid=FolderIconRenderer.IconRect(new Rect(10,20,64,78));
         Check(grid.width==64 && grid.x==10 && grid.y==20,"grid icon geometry");
+        Artwork();
         File.WriteAllText("CHECKS-PASS.txt",checks+" checks passed on Unity "+Application.unityVersion+"\n");
         Debug.Log("BLUMFOLDERICON CHECKS PASS: "+checks);
     }
@@ -111,7 +112,51 @@ public static class FolderIconChecks
 
     public static void Export()
     {
-        AssetDatabase.ExportPackage("Assets/Blumgames/FolderIcon","../BlumFolderIcon-1.0.0.unitypackage",ExportPackageOptions.Recurse);
+        AssetDatabase.ExportPackage("Assets/Blumgames/FolderIcon","../release-1.1.0/BlumFolderIcon-1.1.0.unitypackage",ExportPackageOptions.Recurse);
         Debug.Log("BLUMFOLDERICON EXPORTED");
+    }
+
+    static void Artwork()
+    {
+        var settings=FolderIconSettings.instance;
+        string original=EditorJsonUtility.ToJson(settings);
+        ColorUtility.TryParseHtmlString("#598DCA",out var oldBlue);
+        var customColor=new Color(.137f,.421f,.739f);
+        settings.SetRule(0,new FolderRule { names="Scripts",style=new FolderStyle { color=oldBlue,symbol=FolderSymbol.Code } });
+        settings.SetRule(1,new FolderRule { names="Scenes",style=new FolderStyle { color=customColor,symbol=FolderSymbol.Scene } });
+        settings.SetOverrides(new[]{"legacy-palette-check"},new FolderStyle { color=oldBlue,symbol=FolderSymbol.Star });
+        var serialized=new SerializedObject(settings);
+        serialized.FindProperty("paletteVersion").intValue=0;
+        serialized.ApplyModifiedPropertiesWithoutUndo();
+        FolderIconRenderer.Refresh();
+        Check(ColorUtility.ToHtmlStringRGB(settings.Resolve("","Scripts").color)=="4699EE","legacy rule palette upgraded");
+        Check(ColorUtility.ToHtmlStringRGB(settings.Resolve("legacy-palette-check","X").color)=="4699EE","legacy manual palette upgraded");
+        Check(settings.Resolve("","Scenes").color==customColor,"custom-picked color preserved");
+        EditorJsonUtility.FromJsonOverwrite(original,settings);
+        FolderIconRenderer.Refresh();
+        settings.SetOptions(true,true);
+
+        for(int i=0;i<FolderPresets.Colors.Length;i++)
+        {
+            var icon=FolderIconRenderer.Preview(new FolderStyle { color=FolderPresets.Colors[i],symbol=FolderSymbol.None });
+            Check(icon.width==256 && icon.height==256,"approved artwork size "+i);
+            Color top=icon.GetPixel(184,195),front=icon.GetPixel(184,145);
+            Check(top.grayscale<front.grayscale*.9f,"rear layer darker than front "+i);
+        }
+        // Reference files are copied into this disposable validation project only.
+        if(Directory.Exists("ApprovedReference"))
+            foreach(var rule in FolderPresets.CreateRules())
+            {
+                var file="ApprovedReference/"+rule.names.Split(',')[0]+".png";
+                var expected=new Texture2D(2,2);expected.LoadImage(File.ReadAllBytes(file));
+                var actual=FolderIconRenderer.Preview(rule.style);
+                var a=actual.GetPixels32();var b=expected.GetPixels32();
+                Check(a.Length==b.Length,"reference size "+file);
+                long error=0;int channels=0;
+                for(int k=0;k<a.Length;k++) if(a[k].a>250 && b[k].a>250)
+                { error+=Math.Abs(a[k].r-b[k].r)+Math.Abs(a[k].g-b[k].g)+Math.Abs(a[k].b-b[k].b);channels+=3; }
+                Check(channels>0 && error/(double)channels<3,"matches approved art "+file+" error="+(channels==0?999:error/(double)channels));
+                UnityEngine.Object.DestroyImmediate(expected);
+            }
     }
 }

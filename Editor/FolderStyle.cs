@@ -15,7 +15,7 @@ namespace Blumgames.FolderIcon
     public sealed class FolderStyle
     {
         public bool colorize = true;
-        public Color color = new Color(0.34f, 0.55f, 0.79f);
+        public Color color = FolderPresets.Colors[0];
         public FolderSymbol symbol = FolderSymbol.Code;
         public string customIconGuid = "";
 
@@ -46,9 +46,27 @@ namespace Blumgames.FolderIcon
         { "Blue", "Coral", "Sage", "Gold", "Lavender", "Teal", "Rose", "Slate" };
         public static readonly Color[] Colors =
         {
-            Hex("598DCA"), Hex("CE786B"), Hex("8BAD7D"), Hex("DCAD55"),
-            Hex("A18EC8"), Hex("5CA9A3"), Hex("BB7F9B"), Hex("89939F")
+            Hex("4699EE"), Hex("F27C68"), Hex("79BE71"), Hex("F2B943"),
+            Hex("AD86EB"), Hex("3DBBAE"), Hex("E67DA8"), Hex("86A3C4")
         };
+
+        // Upgrade exact v1.0 preset colors only. User-picked colors stay intact.
+        static readonly string[] LegacyColors =
+        { "598DCA", "CE786B", "8BAD7D", "DCAD55", "A18EC8", "5CA9A3", "BB7F9B", "89939F" };
+
+        internal static bool UpgradeColor(FolderStyle style)
+        {
+            if (style == null) return false;
+            string rgb = ColorUtility.ToHtmlStringRGB(style.color);
+            for (int i = 0; i < LegacyColors.Length; i++)
+                if (rgb == LegacyColors[i])
+                {
+                    float alpha = style.color.a;
+                    style.color = Colors[i]; style.color.a = alpha;
+                    return true;
+                }
+            return false;
+        }
 
         public static List<FolderRule> CreateRules() => new List<FolderRule>
         {

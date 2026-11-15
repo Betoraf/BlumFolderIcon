@@ -86,8 +86,12 @@ namespace Blumgames.FolderIcon
             if (Textures.TryGetValue(key, out var cached) && cached) return cached;
             // Bound generated texture memory without creating a continuous repaint loop.
             if (Textures.Count > 256) { foreach(var t in Textures.Values) if(t) UnityEngine.Object.DestroyImmediate(t); Textures.Clear(); }
-            var input = ReadPixels(source);
-            int w = source.width, h = source.height;
+            var artwork = style.colorize ? FolderGlyphs.Load("FolderLight") : source;
+            var shade = style.colorize ? FolderGlyphs.Load("FolderDark") : null;
+            if (!artwork || (style.colorize && !shade)) return source;
+            var input = ReadPixels(artwork);
+            var shaded = shade ? ReadPixels(shade) : null;
+            int w = artwork.width, h = artwork.height;
             var output = new Color32[input.Length];
             int x0=w, y0=h, x1=0, y1=0;
             for(int y=0;y<h;y++) for(int x=0;x<w;x++)
@@ -97,8 +101,9 @@ namespace Blumgames.FolderIcon
                 if(original.a>.2f) { x0=Mathf.Min(x0,x); y0=Mathf.Min(y0,y); x1=Mathf.Max(x1,x); y1=Mathf.Max(y1,y); }
                 if(style.colorize)
                 {
-                    float light=Mathf.Max(original.r,Mathf.Max(original.g,original.b));
-                    Color tinted=style.color * Mathf.Lerp(.63f,1.12f,light);
+                    Color low=shaded[i];
+                    Color tinted=new Color(low.r+(original.r-low.r)*style.color.r,
+                        low.g+(original.g-low.g)*style.color.g,low.b+(original.b-low.b)*style.color.b);
                     tinted.a=original.a;
                     output[i]=tinted;
                 }
@@ -110,17 +115,19 @@ namespace Blumgames.FolderIcon
             if(glyph && x1>x0 && y1>y0)
             {
                 var gp=ReadPixels(glyph);
-                float width=(x1-x0+1)*.55f, height=(y1-y0+1)*.53f;
+                bool approvedPlacement=style.colorize && style.symbol!=FolderSymbol.Custom;
+                float width=approvedPlacement ? w*.5625f : (x1-x0+1)*.55f;
+                float height=approvedPlacement ? h*.5625f : (y1-y0+1)*.53f;
                 float fit=Mathf.Min(width/glyph.width,height/glyph.height);
                 width=glyph.width*fit; height=glyph.height*fit;
-                float left=(x0+x1+1-width)*.5f, bottom=y0+(y1-y0+1)*.42f-height*.5f;
+                float left=approvedPlacement ? w*.21875f : (x0+x1+1-width)*.5f;
+                float bottom=approvedPlacement ? h*.125f : y0+(y1-y0+1)*.42f-height*.5f;
                 for(int y=Mathf.Max(0,Mathf.FloorToInt(bottom));y<Mathf.Min(h,Mathf.CeilToInt(bottom+height));y++)
                     for(int x=Mathf.Max(0,Mathf.FloorToInt(left));x<Mathf.Min(w,Mathf.CeilToInt(left+width));x++)
                     {
                         float u=(x+.5f-left)/width, v=(y+.5f-bottom)/height;
                         Color fg=Sample(gp,glyph.width,glyph.height,u,v);
                         Color bg=output[y*w+x];
-                        if(style.symbol != FolderSymbol.Custom) { fg.r=.98f; fg.g=.97f; fg.b=.94f; }
                         output[y*w+x]=Color.Lerp(bg,new Color(fg.r,fg.g,fg.b,bg.a),fg.a*bg.a);
                     }
             }

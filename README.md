@@ -8,6 +8,8 @@ Scripts, Audio, Prefabs and other familiar folders get their own look as soon as
 
 [Download .unitypackage](https://github.com/Betoraf/BlumFolderIcon/releases/latest) · [Report an issue](https://github.com/Betoraf/BlumFolderIcon/issues) · [MIT license](LICENSE.md)
 
+![Brighter folder colors and redesigned symbols](https://raw.githubusercontent.com/Betoraf/BlumFolderIcon/main/media/icons-preview.png)
+
 ## What you get
 
 - **Automatic icons:** 19 editable name rules, with singular/plural aliases and case-insensitive matching.
@@ -18,13 +20,17 @@ Scripts, Audio, Prefabs and other familiar folders get their own look as soon as
 - **Light and dark themes**, Project tree, list and grid views.
 - **Editor-only:** no runtime assembly, network requests, telemetry, or external dependencies.
 
+## Updating from 1.0
+
+Install 1.1 over your existing copy using the same installation method. Saved colors that exactly match the old presets upgrade to the brighter palette automatically. Custom colors, symbols, folder GUIDs and rules are preserved.
+
 ## Install
 
 Choose **one** installation method. Do not install both copies in the same project.
 
 ### .unitypackage
 
-1. Download **BlumFolderIcon-1.0.0.unitypackage** from [Releases](https://github.com/Betoraf/BlumFolderIcon/releases/latest).
+1. Download **BlumFolderIcon-1.1.0.unitypackage** from [Releases](https://github.com/Betoraf/BlumFolderIcon/releases/latest).
 2. Open it with Unity and import all files.
 3. Your standard folders are styled automatically.
 
@@ -33,7 +39,7 @@ Choose **one** installation method. Do not install both copies in the same proje
 Open **Window → Package Manager**, choose **Add package from git URL**, and paste:
 
 ```text
-https://github.com/Betoraf/BlumFolderIcon.git#v1.0.0
+https://github.com/Betoraf/BlumFolderIcon.git#v1.1.0
 ```
 
 Git must be installed on your computer for Package Manager's Git installation.
@@ -74,7 +80,7 @@ The settings file is created only after you change a setting. Deleting a folder 
 
 Requires **Unity 2022.3 or newer**. Tested on **2022.3.62f3** and **6000.3.27f2** on macOS. Other Editor versions and operating systems have not been individually verified.
 
-BlumFolderIcon decorates folders in the **Project window**, not operating-system folders, the Hierarchy, or the Inspector. It uses Unity's built-in folder silhouette, so small visual differences between Editor versions are expected. Unity version-control badges remain Unity's responsibility.
+BlumFolderIcon decorates folders in the **Project window**, not operating-system folders, the Hierarchy, or the Inspector. Colored folders use original layered artwork with a darker rear tab. The native Unity appearance remains available through **Use Unity Default**. Unity version-control badges remain Unity's responsibility.
 
 Use one folder-styling extension at a time. Two packages drawing over the same Project icon can overlap.
 
@@ -82,7 +88,7 @@ Use one folder-styling extension at a time. Two packages drawing over the same P
 
 A public Project-window callback draws cached folder textures. Folder lookups, rules and generated icons are cached; repainting an already-seen folder does not scan the filesystem or regenerate its texture. No reflection into Unity's Project Browser internals is required.
 
-The customization window uses UI Toolkit. All code is contained in the `Blumgames.FolderIcon.Editor` assembly, excluded from player builds. Built-in symbol artwork is original geometric artwork; folder silhouettes are supplied by the installed Unity Editor and are not redistributed as source assets.
+The customization window uses UI Toolkit. All code is contained in the `Blumgames.FolderIcon.Editor` assembly, excluded from player builds. Folder artwork and all 22 symbols are original. The repository includes matching SVG sources in `Artwork~`; the Editor loads the PNG assets once and caches the tinted results.
 
 ## Credits & license
 
