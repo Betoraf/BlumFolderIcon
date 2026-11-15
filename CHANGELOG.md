@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.1.1 — 2026-11-16
+
+- Match Project-window folder sizes to Unity's native icon bounds, including transparent padding.
+- Keep the darker rear layer and cover the underlying gray folder.
+- Give all 21 automatic categories distinct colors. Split Sprites from Textures and ThirdParty from Plugins.
+- Migrate unchanged default rules while preserving manual overrides, customized rules and disabled rules.
+- Validate native icon bounds, migration, Undo/Redo, caching and Editor-only isolation in Unity 2022.3 and Unity 6.
+
+
 ## 1.1.0 — 2026-11-16
 
 - Brighter 8-color palette and 22 redesigned, softer symbols.

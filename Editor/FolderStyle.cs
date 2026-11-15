@@ -70,6 +70,31 @@ namespace Blumgames.FolderIcon
 
         public static List<FolderRule> CreateRules() => new List<FolderRule>
         {
+            Rule("Scripts, Script, Code", FolderSymbol.Code, "4699EE"),
+            Rule("Scenes, Scene, Levels, Level", FolderSymbol.Scene, "AD86EB"),
+            Rule("Prefabs, Prefab", FolderSymbol.Cube, "79BE71"),
+            Rule("Materials, Material", FolderSymbol.Material, "E67DA8"),
+            Rule("Textures, Texture, Images, Image", FolderSymbol.Image, "F2B943"),
+            Rule("Sprites, Sprite", FolderSymbol.Image, "FF8A36"),
+            Rule("Audio, Sounds, Sound, Music, SFX", FolderSymbol.Audio, "F27C68"),
+            Rule("Animations, Animation, Animators, Animator", FolderSymbol.Animation, "825CE6"),
+            Rule("Editor, Editors, Tools", FolderSymbol.Tools, "86A3C4"),
+            Rule("UI, GUI, Interface", FolderSymbol.UI, "3DBBAE"),
+            Rule("Fonts, Font", FolderSymbol.Font, "E6D35E"),
+            Rule("Shaders, Shader, ShaderGraphs", FolderSymbol.Shader, "C34DC1"),
+            Rule("Models, Model, Meshes, Mesh", FolderSymbol.Model, "36A873"),
+            Rule("Resources, Resource, Addressables", FolderSymbol.Resources, "27BFD7"),
+            Rule("Plugins, Plugin", FolderSymbol.Plugins, "5E71CE"),
+            Rule("ThirdParty", FolderSymbol.Plugins, "B69B7D"),
+            Rule("Settings, Config, Configuration", FolderSymbol.Settings, "A3ACB5"),
+            Rule("Tests, Test", FolderSymbol.Tests, "B3C951"),
+            Rule("Documentation, Documents, Docs", FolderSymbol.Documentation, "4C9FB8"),
+            Rule("VFX, FX, Effects, Particles", FolderSymbol.Particles, "EA5753"),
+            Rule("Video, Videos, Movies", FolderSymbol.Video, "BC69A2")
+        };
+
+        internal static List<FolderRule> CreateLegacyRules() => new List<FolderRule>
+        {
             Rule("Scripts, Script, Code", FolderSymbol.Code, 0),
             Rule("Scenes, Scene, Levels, Level", FolderSymbol.Scene, 4),
             Rule("Prefabs, Prefab", FolderSymbol.Cube, 2),
@@ -93,6 +118,34 @@ namespace Blumgames.FolderIcon
 
         static FolderRule Rule(string names, FolderSymbol symbol, int color) => new FolderRule
         { names = names, style = new FolderStyle { color = Colors[color], symbol = symbol } };
+
+        static FolderRule Rule(string names, FolderSymbol symbol, string color) => new FolderRule
+        { names = names, style = new FolderStyle { color = Hex(color), symbol = symbol } };
+
+        internal static void UpgradeRules(List<FolderRule> rules)
+        {
+            var legacy = CreateLegacyRules();
+            var current = CreateRules();
+            for (int i = rules.Count - 1; i >= 0; i--)
+            {
+                var rule = rules[i];
+                if (rule?.style == null) continue;
+                var original = legacy.Find(r => r.names == rule.names);
+                if (original == null || !rule.style.colorize || rule.style.color != original.style.color
+                    || rule.style.symbol != original.style.symbol || !string.IsNullOrEmpty(rule.style.customIconGuid)) continue;
+                string name = rule.names.Split(',')[0];
+                var replacement = current.Find(r => r.names.Split(',')[0] == name);
+                replacement.enabled = rule.enabled;
+                rules[i] = replacement;
+                string extra = name == "Textures" ? "Sprites" : name == "Plugins" ? "ThirdParty" : null;
+                if (extra != null)
+                {
+                    var split = current.Find(r => r.names.Split(',')[0] == extra);
+                    split.enabled = rule.enabled;
+                    rules.Insert(i + 1, split);
+                }
+            }
+        }
 
         static Color Hex(string value)
         {

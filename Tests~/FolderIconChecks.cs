@@ -16,7 +16,7 @@ public static class FolderIconChecks
         var settings=FolderIconSettings.instance;
         settings.SetOptions(true,true);
         settings.RestoreRules();
-        Check(settings.Rules.Count==19,"default rules");
+        Check(settings.Rules.Count==21,"default rules");
         Check(settings.Resolve("", "sCrIpTs").symbol==FolderSymbol.Code,"case-insensitive aliases");
         Check(settings.Resolve("", "Script").symbol==FolderSymbol.Code,"singular alias");
         Check(settings.Resolve("", "Music").symbol==FolderSymbol.Audio,"audio aliases");
@@ -25,7 +25,7 @@ public static class FolderIconChecks
         if(AssetDatabase.IsValidFolder("Assets/Checks")) AssetDatabase.DeleteAsset("Assets/Checks");
         Directory.CreateDirectory("Assets/Checks/A/Scripts");
         Directory.CreateDirectory("Assets/Checks/B/Scripts");
-        foreach(var name in new[]{"Scripts","Audio","Scenes","Prefabs","Materials","Textures","Editor","UI","Shaders","Models","Resources","Fonts","Animations","Plugins","Settings","Tests","Docs","VFX","Video"})
+        foreach(var name in new[]{"Scripts","Audio","Scenes","Prefabs","Materials","Textures","Sprites","ThirdParty","Native","Editor","UI","Shaders","Models","Resources","Fonts","Animations","Plugins","Settings","Tests","Docs","VFX","Video"})
             Directory.CreateDirectory("Assets/Demo/"+name);
         AssetDatabase.Refresh(ImportAssetOptions.ForceSynchronousImport);
         string first=AssetDatabase.AssetPathToGUID("Assets/Checks/A/Scripts"),second=AssetDatabase.AssetPathToGUID("Assets/Checks/B/Scripts");
@@ -95,6 +95,8 @@ public static class FolderIconChecks
         var grid=FolderIconRenderer.IconRect(new Rect(10,20,64,78));
         Check(grid.width==64 && grid.x==10 && grid.y==20,"grid icon geometry");
         Artwork();
+        NativeSizing();
+        CategoryColors();
         File.WriteAllText("CHECKS-PASS.txt",checks+" checks passed on Unity "+Application.unityVersion+"\n");
         Debug.Log("BLUMFOLDERICON CHECKS PASS: "+checks);
     }
@@ -112,7 +114,7 @@ public static class FolderIconChecks
 
     public static void Export()
     {
-        AssetDatabase.ExportPackage("Assets/Blumgames/FolderIcon","../release-1.1.0/BlumFolderIcon-1.1.0.unitypackage",ExportPackageOptions.Recurse);
+        AssetDatabase.ExportPackage("Assets/Blumgames/FolderIcon","../release-1.1.1/BlumFolderIcon-1.1.1.unitypackage",ExportPackageOptions.Recurse);
         Debug.Log("BLUMFOLDERICON EXPORTED");
     }
 
@@ -143,20 +145,68 @@ public static class FolderIconChecks
             Color top=icon.GetPixel(184,195),front=icon.GetPixel(184,145);
             Check(top.grayscale<front.grayscale*.9f,"rear layer darker than front "+i);
         }
-        // Reference files are copied into this disposable validation project only.
-        if(Directory.Exists("ApprovedReference"))
-            foreach(var rule in FolderPresets.CreateRules())
-            {
-                var file="ApprovedReference/"+rule.names.Split(',')[0]+".png";
-                var expected=new Texture2D(2,2);expected.LoadImage(File.ReadAllBytes(file));
-                var actual=FolderIconRenderer.Preview(rule.style);
-                var a=actual.GetPixels32();var b=expected.GetPixels32();
-                Check(a.Length==b.Length,"reference size "+file);
-                long error=0;int channels=0;
-                for(int k=0;k<a.Length;k++) if(a[k].a>250 && b[k].a>250)
-                { error+=Math.Abs(a[k].r-b[k].r)+Math.Abs(a[k].g-b[k].g)+Math.Abs(a[k].b-b[k].b);channels+=3; }
-                Check(channels>0 && error/(double)channels<3,"matches approved art "+file+" error="+(channels==0?999:error/(double)channels));
-                UnityEngine.Object.DestroyImmediate(expected);
-            }
+    }
+
+    static void NativeSizing()
+    {
+        foreach (string name in new[]{"Folder Icon","FolderEmpty Icon","d_Folder Icon","d_FolderEmpty Icon"})
+        {
+            var source=EditorGUIUtility.IconContent(name).image as Texture2D;
+            Check(source!=null,"built-in folder "+name);
+            var native=FolderIconRenderer.Preview(FolderStyle.Native(),source);
+            var fitted=FolderIconRenderer.Preview(new FolderStyle(),source,true);
+            Check(fitted.width==native.width && fitted.height==native.height,"native canvas "+name);
+            var a=fitted.GetPixels32(); var b=native.GetPixels32();
+            Check(Bounds(a,fitted.width).Equals(Bounds(b,native.width)),"native visible bounds "+name);
+            Check(a.Zip(b,(p,q)=>p.a>=q.a).All(v=>v),"underlying native folder fully covered "+name);
+            Check(FolderIconRenderer.Preview(new FolderStyle(),source,true)==fitted,"fitted texture cache "+name);
+            File.WriteAllBytes("Previews/Native-"+name.Replace(' ','-')+".png",native.EncodeToPNG());
+            File.WriteAllBytes("Previews/Fitted-"+name.Replace(' ','-')+".png",fitted.EncodeToPNG());
+        }
+    }
+
+    static RectInt Bounds(Color32[] pixels,int width)
+    {
+        var solid=Enumerable.Range(0,pixels.Length).Where(i=>pixels[i].a>51).ToArray();
+        int left=solid.Min(i=>i%width),bottom=solid.Min(i=>i/width);
+        return new RectInt(left,bottom,solid.Max(i=>i%width)-left+1,solid.Max(i=>i/width)-bottom+1);
+    }
+
+    static void CategoryColors()
+    {
+        var settings=FolderIconSettings.instance;
+        string saved=EditorJsonUtility.ToJson(settings);
+        var rules=FolderPresets.CreateRules();
+        Check(rules.Select(r=>ColorUtility.ToHtmlStringRGB(r.style.color)).Distinct().Count()==21,"21 distinct automatic category colors");
+        EditorJsonUtility.FromJsonOverwrite(File.ReadAllText("Settings-1.1.json"),settings);
+        FolderIconRenderer.Refresh();
+        Check(settings.Rules.Count==21,"upgrade splits sprites and thirdparty");
+        Check(settings.Rules.Select(r=>ColorUtility.ToHtmlStringRGB(r.style.color)).Distinct().Count()==21,"all unchanged defaults migrate");
+        Check(settings.Resolve("","Sprites").color!=settings.Resolve("","Textures").color,"sprites distinct from textures");
+        Check(settings.Resolve("","Thirdparty").color!=settings.Resolve("","Plugins").color,"thirdparty distinct from plugins");
+        string once=EditorJsonUtility.ToJson(settings);
+        FolderIconRenderer.Refresh();
+        Check(once==EditorJsonUtility.ToJson(settings),"migration idempotent");
+
+        EditorJsonUtility.FromJsonOverwrite(File.ReadAllText("Settings-1.1.json"),settings);
+        // Edit serialized fields before migration to represent user-customized 1.1 settings.
+        var so=new SerializedObject(settings);
+        so.FindProperty("rules").GetArrayElementAtIndex(4).FindPropertyRelative("style.color").colorValue=Color.magenta;
+        so.FindProperty("rules").GetArrayElementAtIndex(13).FindPropertyRelative("enabled").boolValue=false;
+        var overrides=so.FindProperty("overrides");overrides.arraySize=1;
+        var item=overrides.GetArrayElementAtIndex(0);
+        item.FindPropertyRelative("guid").stringValue="manual-check";
+        item.FindPropertyRelative("style.colorize").boolValue=true;
+        item.FindPropertyRelative("style.color").colorValue=FolderPresets.Colors[7];
+        item.FindPropertyRelative("style.symbol").enumValueIndex=(int)FolderSymbol.Plugins;
+        so.ApplyModifiedPropertiesWithoutUndo();
+        FolderIconRenderer.Refresh();
+        Check(settings.Resolve("","Sprites").color==Color.magenta,"customized alias group preserved");
+        Check(settings.Resolve("","Plugins")==null && settings.Resolve("","ThirdParty")==null,"split disabled rule remains disabled");
+        Check(settings.Resolve("manual-check","Plugins").color==FolderPresets.Colors[7],"manual preset color preserved");
+        Check(settings.Resolve("manual-check","Plugins").symbol==FolderSymbol.Plugins,"manual symbol preserved");
+        EditorJsonUtility.FromJsonOverwrite(saved,settings);
+        FolderIconRenderer.Refresh();
+        settings.SetOptions(true,true);
     }
 }

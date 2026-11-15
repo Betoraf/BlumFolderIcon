@@ -1,12 +1,9 @@
-# Editor smoke checks
+# Validation
 
-Run only in an empty, disposable Unity project. These checks create `Assets/Checks`, `Assets/Demo`, a small test PNG and project settings. A repeated run replaces `Assets/Checks`.
+Copy `FolderIconChecks.cs` to `Assets/Editor/` in a disposable Unity project containing the package. Copy `Settings-1.1.json` to the project root. Run `FolderIconChecks.Run` via `-executeMethod`.
 
-1. Import the release `.unitypackage` into the empty project.
-2. Copy `FolderIconChecks.cs` into `Assets/Editor`.
-3. Launch the project with Unity's `-batchmode -quit -executeMethod FolderIconChecks.Run` arguments.
-4. Launch again with `-executeMethod FolderIconChecks.Persistence` to check persistence across processes.
+The checks create test folders and change package settings. Do not run in a production project.
 
-`CHECKS-PASS.txt` records 97 successful assertions. `PERSISTENCE-PASS.txt` records the restart check. Exceptions fail the run. The checks cover rules, GUID overrides, rename/move, bulk edits, Undo/Redo, reset, custom unreadable PNG import, transparency, caching, Editor-only assembly targeting, palette migration, and the darker rear folder layer.
+127 assertions cover aliases, customization, Undo/Redo, GUID persistence, custom PNGs, caching, artwork, native icon bounds and automatic color migration. The migration fixture includes the original 1.1 defaults. Customized alias groups, manual colors and disabled rules must survive updates.
 
-The release validation additionally compared all 19 default folder styles against 256×256 renders of the approved SVG artwork (135 assertions total). To repeat those comparisons, place the renders in `ApprovedReference` at the test project's root, named after each rule's first alias. Visual inspection of the Project window and customization window is also required.
+Run `FolderIconChecks.Persistence` after restarting the Editor to verify the saved customization. `FolderIconChecks.Export` creates the release unitypackage from `Assets/Blumgames/FolderIcon`.

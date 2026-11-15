@@ -1,0 +1,296 @@
+{
+  "MonoBehaviour": {
+    "initialized": true,
+    "paletteVersion": 1,
+    "enabled": true,
+    "automatic": true,
+    "rules": [
+      {
+        "enabled": true,
+        "names": "Scripts, Script, Code",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.27450980392156865,
+            "g": 0.6,
+            "b": 0.9333333333333333,
+            "a": 1
+          },
+          "symbol": 1,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Scenes, Scene, Levels, Level",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.6784313725490196,
+            "g": 0.5254901960784314,
+            "b": 0.9215686274509803,
+            "a": 1
+          },
+          "symbol": 2,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Prefabs, Prefab",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.4745098039215686,
+            "g": 0.7450980392156863,
+            "b": 0.44313725490196076,
+            "a": 1
+          },
+          "symbol": 3,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Materials, Material",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.9019607843137255,
+            "g": 0.49019607843137253,
+            "b": 0.6588235294117647,
+            "a": 1
+          },
+          "symbol": 4,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Textures, Texture, Sprites, Sprite, Images, Image",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.9490196078431372,
+            "g": 0.7254901960784313,
+            "b": 0.2627450980392157,
+            "a": 1
+          },
+          "symbol": 5,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Audio, Sounds, Sound, Music, SFX",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.9490196078431372,
+            "g": 0.48627450980392156,
+            "b": 0.40784313725490196,
+            "a": 1
+          },
+          "symbol": 6,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Animations, Animation, Animators, Animator",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.6784313725490196,
+            "g": 0.5254901960784314,
+            "b": 0.9215686274509803,
+            "a": 1
+          },
+          "symbol": 7,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Editor, Editors, Tools",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.5254901960784314,
+            "g": 0.6392156862745098,
+            "b": 0.7686274509803922,
+            "a": 1
+          },
+          "symbol": 8,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "UI, GUI, Interface",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.23921568627450981,
+            "g": 0.7333333333333333,
+            "b": 0.6823529411764706,
+            "a": 1
+          },
+          "symbol": 9,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Fonts, Font",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.9490196078431372,
+            "g": 0.7254901960784313,
+            "b": 0.2627450980392157,
+            "a": 1
+          },
+          "symbol": 10,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Shaders, Shader, ShaderGraphs",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.9019607843137255,
+            "g": 0.49019607843137253,
+            "b": 0.6588235294117647,
+            "a": 1
+          },
+          "symbol": 11,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Models, Model, Meshes, Mesh",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.4745098039215686,
+            "g": 0.7450980392156863,
+            "b": 0.44313725490196076,
+            "a": 1
+          },
+          "symbol": 12,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Resources, Resource, Addressables",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.9490196078431372,
+            "g": 0.7254901960784313,
+            "b": 0.2627450980392157,
+            "a": 1
+          },
+          "symbol": 13,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Plugins, Plugin, ThirdParty",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.5254901960784314,
+            "g": 0.6392156862745098,
+            "b": 0.7686274509803922,
+            "a": 1
+          },
+          "symbol": 14,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Settings, Config, Configuration",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.5254901960784314,
+            "g": 0.6392156862745098,
+            "b": 0.7686274509803922,
+            "a": 1
+          },
+          "symbol": 15,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Tests, Test",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.4745098039215686,
+            "g": 0.7450980392156863,
+            "b": 0.44313725490196076,
+            "a": 1
+          },
+          "symbol": 16,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Documentation, Documents, Docs",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.27450980392156865,
+            "g": 0.6,
+            "b": 0.9333333333333333,
+            "a": 1
+          },
+          "symbol": 17,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "VFX, FX, Effects, Particles",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.9490196078431372,
+            "g": 0.48627450980392156,
+            "b": 0.40784313725490196,
+            "a": 1
+          },
+          "symbol": 21,
+          "customIconGuid": ""
+        }
+      },
+      {
+        "enabled": true,
+        "names": "Video, Videos, Movies",
+        "style": {
+          "colorize": true,
+          "color": {
+            "r": 0.6784313725490196,
+            "g": 0.5254901960784314,
+            "b": 0.9215686274509803,
+            "a": 1
+          },
+          "symbol": 22,
+          "customIconGuid": ""
+        }
+      }
+    ],
+    "overrides": []
+  }
+}

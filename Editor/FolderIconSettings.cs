@@ -30,15 +30,20 @@ namespace Blumgames.FolderIcon
             {
                 rules = FolderPresets.CreateRules();
                 initialized = true;
-                paletteVersion = 1;
+                paletteVersion = 2;
                 return;
             }
-            if (paletteVersion >= 1) return;
-            bool changed = false;
-            foreach (var rule in rules) changed |= FolderPresets.UpgradeColor(rule?.style);
-            foreach (var item in overrides) changed |= FolderPresets.UpgradeColor(item?.style);
-            paletteVersion = 1;
-            if (changed) Save(true);
+            if (paletteVersion >= 2) return;
+            if (paletteVersion < 1)
+            {
+                foreach (var rule in rules) FolderPresets.UpgradeColor(rule?.style);
+                foreach (var item in overrides) FolderPresets.UpgradeColor(item?.style);
+            }
+            // Only unchanged automatic defaults receive the new category colors.
+            // Manual folder overrides and customized rules are never recolored here.
+            FolderPresets.UpgradeRules(rules);
+            paletteVersion = 2;
+            Save(true);
         }
 
         void BuildLookup()

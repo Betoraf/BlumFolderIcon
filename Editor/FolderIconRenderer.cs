@@ -64,7 +64,7 @@ namespace Blumgames.FolderIcon
             }
             if (!entry.isFolder || entry.style == null || (!entry.style.colorize && entry.style.symbol == FolderSymbol.None)) return;
             var iconRect = IconRect(rect);
-            if (!entry.texture) entry.texture = Preview(entry.style, entry.source);
+            if (!entry.texture) entry.texture = Preview(entry.style, entry.source, true);
             GUI.DrawTexture(iconRect, entry.texture, ScaleMode.ScaleToFit, true);
         }
 
@@ -76,13 +76,13 @@ namespace Blumgames.FolderIcon
             return new Rect(rect.x, rect.y, 16f, 16f);
         }
 
-        public static Texture2D Preview(FolderStyle style, Texture2D source = null)
+        public static Texture2D Preview(FolderStyle style, Texture2D source = null, bool matchNativeSize = false)
         {
             if (!source) source = EditorGUIUtility.IconContent("Folder Icon").image as Texture2D;
             if (!source) return Texture2D.grayTexture;
             style = style ?? FolderStyle.Native();
             string key = source.GetInstanceID() + ":" + style.colorize + ":" + ColorUtility.ToHtmlStringRGBA(style.color)
-                + ":" + (int)style.symbol + ":" + style.customIconGuid;
+                + ":" + (int)style.symbol + ":" + style.customIconGuid + ":" + matchNativeSize;
             if (Textures.TryGetValue(key, out var cached) && cached) return cached;
             // Bound generated texture memory without creating a continuous repaint loop.
             if (Textures.Count > 256) { foreach(var t in Textures.Values) if(t) UnityEngine.Object.DestroyImmediate(t); Textures.Clear(); }
@@ -131,10 +131,54 @@ namespace Blumgames.FolderIcon
                         output[y*w+x]=Color.Lerp(bg,new Color(fg.r,fg.g,fg.b,bg.a),fg.a*bg.a);
                     }
             }
+            if (matchNativeSize && style.colorize)
+            {
+                output = FitNative(output, w, h, source, style.color);
+                w = source.width; h = source.height;
+            }
             var texture = new Texture2D(w,h,TextureFormat.RGBA32,false)
             { name="BlumFolderIcon preview",hideFlags=HideFlags.HideAndDontSave,filterMode=FilterMode.Bilinear };
             texture.SetPixels32(output); texture.Apply(false,false); Textures[key]=texture;
             return texture;
+        }
+
+        // Native textures have their own padding. Match their visible bounds,
+        // rather than treating the custom PNG's canvas as the visible folder size.
+        static Color32[] FitNative(Color32[] artwork, int width, int height, Texture2D native, Color tint)
+        {
+            var mask = ReadPixels(native);
+            var from = AlphaBounds(artwork, width, height);
+            var to = AlphaBounds(mask, native.width, native.height);
+            var result = new Color32[mask.Length];
+            if (from.width == 0 || to.width == 0) return result;
+            for (int y = 0; y < native.height; y++)
+                for (int x = 0; x < native.width; x++)
+                {
+                    int i = y * native.width + x;
+                    bool inside = to.Contains(new Vector2Int(x, y));
+                    if (!inside && mask[i].a == 0) continue;
+                    float u = (from.x + (x + .5f - to.x) / to.width * from.width) / width;
+                    float v = (from.y + (y + .5f - to.y) / to.height * from.height) / height;
+                    Color art = inside ? Sample(artwork, width, height, u, v) : Color.clear;
+                    // Fill small differences between the two rounded silhouettes, so Unity's
+                    // gray folder cannot peek through around the custom artwork.
+                    Color color = Color.Lerp(tint, art, art.a);
+                    color.a = Mathf.Max(art.a, mask[i].a / 255f);
+                    if (color.a > 0f) result[i] = color;
+                }
+            return result;
+        }
+
+        static RectInt AlphaBounds(Color32[] pixels, int width, int height)
+        {
+            int left = width, bottom = height, right = -1, top = -1;
+            for (int y = 0; y < height; y++) for (int x = 0; x < width; x++)
+                if (pixels[y * width + x].a > 51)
+                {
+                    left = Mathf.Min(left, x); bottom = Mathf.Min(bottom, y);
+                    right = Mathf.Max(right, x); top = Mathf.Max(top, y);
+                }
+            return right < left ? new RectInt() : new RectInt(left, bottom, right - left + 1, top - bottom + 1);
         }
 
         static Color Sample(Color32[] data,int w,int h,float u,float v)

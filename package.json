@@ -1,6 +1,6 @@
 {
   "name": "com.blumgames.folder-icon",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "displayName": "BlumFolderIcon",
   "description": "Find your folders faster. Automatic colors and symbols for the Unity Project window, with per-folder customization.",
   "unity": "2022.3",
